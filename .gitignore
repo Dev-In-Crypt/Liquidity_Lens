@@ -1,0 +1,38 @@
+# ── Dependencies ──────────────────────────────────────────
+node_modules/
+
+# ── Build outputs ─────────────────────────────────────────
+dist/
+build/
+out/
+.next/
+*.tsbuildinfo
+
+# ── Secrets & environment ──────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Planning & private docs ────────────────────────────────
+Implementation_plan.md
+liquiditylens_mockup.html
+
+# ── OS / editor ───────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# ── Logs ──────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Test coverage ─────────────────────────────────────────
+coverage/
+.nyc_output/
