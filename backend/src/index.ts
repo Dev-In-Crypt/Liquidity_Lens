@@ -6,9 +6,16 @@ import routes from './api/routes'
 import { initSocketServer } from './api/socketServer'
 import { wsClient } from './ingestion/wsClient'
 import { restPoller } from './ingestion/restPoller'
-import { setCurrentPrice, setHeatmapBuckets, setWalletScore } from './engine/store'
-import { buildHeatmap } from './engine/liqCalculator'
+import { setCurrentPrice, setCurrentPriceForMarket, setHeatmapBucketsForMarket, setWalletScore } from './engine/store'
+import { buildHeatmap, SUPPORTED_MARKETS } from './engine/liqCalculator'
 import { MOCK_POSITIONS, MOCK_WALLET_SCORES, MOCK_CURRENT_PRICE } from './mock/mockData'
+
+// Mock prices per market (match current real market prices for chart alignment)
+const MOCK_PRICES: Record<string, number> = {
+  BTC: MOCK_CURRENT_PRICE, // ~$71,000
+  ETH: 2100,
+  SOL: 85,
+}
 
 async function verifyBuilderCode(): Promise<void> {
   if (!config.builderCode || config.builderCode === 'your_builder_code_here') {
@@ -44,12 +51,29 @@ async function main(): Promise<void> {
   if (config.useMockData) {
     // Mock mode: bypass WS and REST, seed store with static data
     console.log('[Server] USE_MOCK_DATA=true — running with mock data')
+
+    // Set prices for all markets
+    for (const market of SUPPORTED_MARKETS) {
+      setCurrentPriceForMarket(market, MOCK_PRICES[market] ?? 0)
+    }
+    // backward-compat
     setCurrentPrice(MOCK_CURRENT_PRICE)
+
+    // Set wallet scores
     for (const score of MOCK_WALLET_SCORES) {
       setWalletScore(score.address, score)
     }
-    const buckets = buildHeatmap(MOCK_POSITIONS, MOCK_WALLET_SCORES, MOCK_CURRENT_PRICE)
-    setHeatmapBuckets(buckets)
+
+    // Build per-market heatmaps from filtered positions
+    for (const market of SUPPORTED_MARKETS) {
+      const marketPositions = MOCK_POSITIONS.filter(
+        (p) => p.symbol.toUpperCase() === market
+      )
+      const marketPrice = MOCK_PRICES[market] ?? 0
+      const buckets = buildHeatmap(marketPositions, MOCK_WALLET_SCORES, marketPrice, market)
+      setHeatmapBucketsForMarket(market, buckets)
+      console.log(`[Mock] ${market}: ${marketPositions.length} positions → ${buckets.length} buckets @ $${marketPrice}`)
+    }
   } else {
     // 4. Start WebSocket client
     wsClient.start()

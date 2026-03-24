@@ -1,49 +1,49 @@
 import { PacificaPosition, TradeRecord, WalletScore } from '../types'
 
-// Realistic mock BTC price cluster around $95,000
-const BASE_PRICE = 95_000
+// Realistic mock BTC price cluster around $71,000 (current market)
+const BASE_PRICE = 71_000
 
 // 30 mock positions spread across realistic liquidation levels
 export const MOCK_POSITIONS: PacificaPosition[] = [
   // Heavy long cluster below — retail longs with 10–20x leverage
-  { account: 'retail1', symbol: 'BTC', side: 'long', size: 2.5, entryPrice: 98000, leverage: 20, margin: 12250, liquidationPrice: 93150, unrealisedPnl: -7500 },
-  { account: 'retail2', symbol: 'BTC', side: 'long', size: 1.8, entryPrice: 97500, leverage: 15, margin: 11700, liquidationPrice: 91100, unrealisedPnl: -4500 },
-  { account: 'retail3', symbol: 'BTC', side: 'long', size: 3.0, entryPrice: 96000, leverage: 10, margin: 28800, liquidationPrice: 86850, unrealisedPnl: -3000 },
-  { account: 'retail4', symbol: 'BTC', side: 'long', size: 0.5, entryPrice: 97000, leverage: 25, margin: 1940, liquidationPrice: 93250, unrealisedPnl: -1000 },
-  { account: 'retail5', symbol: 'BTC', side: 'long', size: 4.0, entryPrice: 98500, leverage: 20, margin: 19700, liquidationPrice: 93650, unrealisedPnl: -14000 },
-  { account: 'retail6', symbol: 'BTC', side: 'long', size: 1.2, entryPrice: 96500, leverage: 10, margin: 11580, liquidationPrice: 87300, unrealisedPnl: -1800 },
-  { account: 'retail7', symbol: 'BTC', side: 'long', size: 2.0, entryPrice: 97200, leverage: 15, margin: 12960, liquidationPrice: 91000, unrealisedPnl: -4400 },
-  { account: 'retail8', symbol: 'BTC', side: 'long', size: 0.8, entryPrice: 98200, leverage: 20, margin: 3928, liquidationPrice: 93350, unrealisedPnl: -2560 },
+  { account: 'retail1', symbol: 'BTC', side: 'long', size: 2.5, entryPrice: 73200, leverage: 20, margin:  9150, liquidationPrice: 69600, unrealisedPnl: -5500 },
+  { account: 'retail2', symbol: 'BTC', side: 'long', size: 1.8, entryPrice: 72800, leverage: 15, margin:  8736, liquidationPrice: 68100, unrealisedPnl: -3240 },
+  { account: 'retail3', symbol: 'BTC', side: 'long', size: 3.0, entryPrice: 71700, leverage: 10, margin: 21510, liquidationPrice: 64900, unrealisedPnl: -2100 },
+  { account: 'retail4', symbol: 'BTC', side: 'long', size: 0.5, entryPrice: 72500, leverage: 25, margin:  1450, liquidationPrice: 69700, unrealisedPnl:  -750 },
+  { account: 'retail5', symbol: 'BTC', side: 'long', size: 4.0, entryPrice: 73600, leverage: 20, margin: 14720, liquidationPrice: 69900, unrealisedPnl: -10400 },
+  { account: 'retail6', symbol: 'BTC', side: 'long', size: 1.2, entryPrice: 72100, leverage: 10, margin:  8652, liquidationPrice: 65200, unrealisedPnl: -1320 },
+  { account: 'retail7', symbol: 'BTC', side: 'long', size: 2.0, entryPrice: 72600, leverage: 15, margin:  9680, liquidationPrice: 67900, unrealisedPnl: -3200 },
+  { account: 'retail8', symbol: 'BTC', side: 'long', size: 0.8, entryPrice: 73400, leverage: 20, margin:  2936, liquidationPrice: 69700, unrealisedPnl: -1920 },
 
   // Smart money longs — lower leverage, wider stop
-  { account: 'smart1', symbol: 'BTC', side: 'long', size: 5.0, entryPrice: 94000, leverage: 3, margin: 156667, liquidationPrice: 63500, unrealisedPnl: 5000 },
-  { account: 'smart2', symbol: 'BTC', side: 'long', size: 3.5, entryPrice: 92000, leverage: 2, margin: 161000, liquidationPrice: 47500, unrealisedPnl: 10500 },
-  { account: 'smart3', symbol: 'BTC', side: 'long', size: 2.0, entryPrice: 90000, leverage: 2, margin: 90000, liquidationPrice: 46000, unrealisedPnl: 10000 },
+  { account: 'smart1', symbol: 'BTC', side: 'long', size: 5.0, entryPrice: 70200, leverage: 3, margin: 117000, liquidationPrice: 47400, unrealisedPnl:  4000 },
+  { account: 'smart2', symbol: 'BTC', side: 'long', size: 3.5, entryPrice: 68700, leverage: 2, margin: 120225, liquidationPrice: 35500, unrealisedPnl:  8050 },
+  { account: 'smart3', symbol: 'BTC', side: 'long', size: 2.0, entryPrice: 67200, leverage: 2, margin:  67200, liquidationPrice: 34400, unrealisedPnl:  7600 },
 
   // Short cluster above — retail shorts with high leverage (likely to get squeezed)
-  { account: 'retail9',  symbol: 'BTC', side: 'short', size: 1.5, entryPrice: 94500, leverage: 15, margin: 9450, liquidationPrice: 100750, unrealisedPnl: -750 },
-  { account: 'retail10', symbol: 'BTC', side: 'short', size: 2.0, entryPrice: 93000, leverage: 10, margin: 18600, liquidationPrice: 102300, unrealisedPnl: 4000 },
-  { account: 'retail11', symbol: 'BTC', side: 'short', size: 0.9, entryPrice: 95500, leverage: 20, margin: 4298, liquidationPrice: 100250, unrealisedPnl: -450 },
-  { account: 'retail12', symbol: 'BTC', side: 'short', size: 3.0, entryPrice: 94000, leverage: 15, margin: 18800, liquidationPrice: 100250, unrealisedPnl: -3000 },
-  { account: 'retail13', symbol: 'BTC', side: 'short', size: 1.0, entryPrice: 96000, leverage: 25, margin: 3840, liquidationPrice: 99900, unrealisedPnl: -1000 },
+  { account: 'retail9',  symbol: 'BTC', side: 'short', size: 1.5, entryPrice: 70600, leverage: 15, margin:  7060, liquidationPrice: 75300, unrealisedPnl:  -560 },
+  { account: 'retail10', symbol: 'BTC', side: 'short', size: 2.0, entryPrice: 69500, leverage: 10, margin: 13900, liquidationPrice: 76400, unrealisedPnl:  3100 },
+  { account: 'retail11', symbol: 'BTC', side: 'short', size: 0.9, entryPrice: 71300, leverage: 20, margin:  3209, liquidationPrice: 74900, unrealisedPnl:  -270 },
+  { account: 'retail12', symbol: 'BTC', side: 'short', size: 3.0, entryPrice: 70200, leverage: 15, margin: 14040, liquidationPrice: 74900, unrealisedPnl: -2340 },
+  { account: 'retail13', symbol: 'BTC', side: 'short', size: 1.0, entryPrice: 71700, leverage: 25, margin:  2868, liquidationPrice: 74600, unrealisedPnl:  -710 },
 
   // Smart money shorts — hedges or strategic
-  { account: 'smart4', symbol: 'BTC', side: 'short', size: 4.0, entryPrice: 98000, leverage: 3, margin: 130667, liquidationPrice: 130500, unrealisedPnl: 12000 },
-  { account: 'smart5', symbol: 'BTC', side: 'short', size: 2.5, entryPrice: 100000, leverage: 2, margin: 125000, liquidationPrice: 149500, unrealisedPnl: 12500 },
+  { account: 'smart4', symbol: 'BTC', side: 'short', size: 4.0, entryPrice: 73200, leverage: 3, margin:  97600, liquidationPrice: 97500, unrealisedPnl:  8400 },
+  { account: 'smart5', symbol: 'BTC', side: 'short', size: 2.5, entryPrice: 74700, leverage: 2, margin:  93375, liquidationPrice: 111700, unrealisedPnl:  8925 },
 
   // Danger zone — very close to current price (within 2%)
-  { account: 'retail14', symbol: 'BTC', side: 'long',  size: 1.0, entryPrice: 97000, leverage: 50, margin:  1940, liquidationPrice: 95100, unrealisedPnl: -2000 },
-  { account: 'retail15', symbol: 'BTC', side: 'long',  size: 2.0, entryPrice: 97500, leverage: 50, margin:  3900, liquidationPrice: 96100, unrealisedPnl: -5000 },
-  { account: 'retail16', symbol: 'BTC', side: 'short', size: 1.5, entryPrice: 93000, leverage: 50, margin:  2790, liquidationPrice: 93950, unrealisedPnl: -3000 },
-  { account: 'retail17', symbol: 'BTC', side: 'long',  size: 0.5, entryPrice: 96800, leverage: 50, margin:   968, liquidationPrice: 95150, unrealisedPnl: -900 },
-  { account: 'smart6',   symbol: 'BTC', side: 'short', size: 3.0, entryPrice: 97000, leverage: 5, margin:  58200, liquidationPrice: 116000, unrealisedPnl: 6000 },
+  { account: 'retail14', symbol: 'BTC', side: 'long',  size: 1.0, entryPrice: 72500, leverage: 50, margin: 1450, liquidationPrice: 71000, unrealisedPnl: -1500 },
+  { account: 'retail15', symbol: 'BTC', side: 'long',  size: 2.0, entryPrice: 72800, leverage: 50, margin: 2912, liquidationPrice: 71800, unrealisedPnl: -3600 },
+  { account: 'retail16', symbol: 'BTC', side: 'short', size: 1.5, entryPrice: 69500, leverage: 50, margin: 2085, liquidationPrice: 70100, unrealisedPnl: -2400 },
+  { account: 'retail17', symbol: 'BTC', side: 'long',  size: 0.5, entryPrice: 72300, leverage: 50, margin:  723, liquidationPrice: 71100, unrealisedPnl:  -650 },
+  { account: 'smart6',   symbol: 'BTC', side: 'short', size: 3.0, entryPrice: 72500, leverage: 5,  margin: 43500, liquidationPrice: 86700, unrealisedPnl:  4500 },
 
   // Medium leverage mixed
-  { account: 'retail18', symbol: 'BTC', side: 'long',  size: 1.0, entryPrice: 96000, leverage: 8, margin: 12000, liquidationPrice: 84600, unrealisedPnl: -1000 },
-  { account: 'retail19', symbol: 'BTC', side: 'long',  size: 2.5, entryPrice: 95500, leverage: 7, margin: 34107, liquidationPrice: 82300, unrealisedPnl:  1250 },
-  { account: 'retail20', symbol: 'BTC', side: 'short', size: 1.0, entryPrice: 94000, leverage: 8, margin: 11750, liquidationPrice: 104800, unrealisedPnl:  1000 },
-  { account: 'smart7',   symbol: 'BTC', side: 'long',  size: 6.0, entryPrice: 88000, leverage: 2, margin: 264000, liquidationPrice: 45000, unrealisedPnl: 42000 },
-  { account: 'smart8',   symbol: 'BTC', side: 'long',  size: 4.0, entryPrice: 85000, leverage: 2, margin: 170000, liquidationPrice: 43500, unrealisedPnl: 40000 },
+  { account: 'retail18', symbol: 'BTC', side: 'long',  size: 1.0, entryPrice: 71700, leverage: 8, margin:  8963, liquidationPrice: 63200, unrealisedPnl:  -700 },
+  { account: 'retail19', symbol: 'BTC', side: 'long',  size: 2.5, entryPrice: 71300, leverage: 7, margin: 25464, liquidationPrice: 61500, unrealisedPnl:  -750 },
+  { account: 'retail20', symbol: 'BTC', side: 'short', size: 1.0, entryPrice: 70200, leverage: 8, margin:  8775, liquidationPrice: 78300, unrealisedPnl:   800 },
+  { account: 'smart7',   symbol: 'BTC', side: 'long',  size: 6.0, entryPrice: 65700, leverage: 2, margin: 197100, liquidationPrice: 33600, unrealisedPnl: 31800 },
+  { account: 'smart8',   symbol: 'BTC', side: 'long',  size: 4.0, entryPrice: 63500, leverage: 2, margin: 127000, liquidationPrice: 32500, unrealisedPnl: 30000 },
 
   // --- ETH positions (entry ~$2100) ---
   { account: 'eth_retail1',  symbol: 'ETH', side: 'long',  size: 8.0,  entryPrice: 2120, leverage: 15, margin:  1131, liquidationPrice: 1980, unrealisedPnl:  -560 },
@@ -128,7 +128,7 @@ export const MOCK_WALLET_SCORES: WalletScore[] = [
   { address: 'sol_retail8', label: 'retail',      score: 13, winRate: 0.20, avgHoldTimeMs: 300_000,     avgPositionSizeUsd: 24360,  tradeCount: 98, lastUpdated: Date.now() },
 ]
 
-export const MOCK_CURRENT_PRICE = BASE_PRICE
+export const MOCK_CURRENT_PRICE = BASE_PRICE // $71,000
 
 // Mock trade history for wallet lookup demo
 export function getMockTradeHistory(account: string): TradeRecord[] {
