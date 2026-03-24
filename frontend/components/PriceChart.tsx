@@ -36,10 +36,10 @@ interface BinanceKline {
 }
 
 function bucketLineColor(b: HeatmapBucket): string {
-  if (b.isDangerZone && b.smartMoneyPct > 60) return '#EF4444'
-  if (b.isDangerZone && b.retailPct > 60) return '#F97316'
-  if (b.isDangerZone) return '#FBBF24'
-  return '#94a3b8'
+  if (b.isDangerZone && b.smartMoneyPct > 60) return 'rgba(239,68,68,0.65)'
+  if (b.isDangerZone && b.retailPct > 60) return 'rgba(249,115,22,0.6)'
+  if (b.isDangerZone) return 'rgba(251,191,36,0.55)'
+  return 'rgba(148,163,184,0.25)'
 }
 
 export default function PriceChart({ market = 'BTC', height = 500, onPriceRangeChange, buckets = [] }: Props) {
@@ -131,11 +131,15 @@ export default function PriceChart({ market = 'BTC', height = 500, onPriceRangeC
     seriesRef.current = series
 
     // Fetch historical candles from Binance public API
+    const abortController = new AbortController()
+
     fetch(
-      `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=200`
+      `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=200`,
+      { signal: abortController.signal }
     )
       .then((r) => r.json())
       .then((raw: unknown[][]) => {
+        if (abortController.signal.aborted) return
         const candles: CandlestickData[] = raw.map((k) => ({
           time: (k[0] as number) / 1000 as Time,
           open: parseFloat(k[1] as string),
@@ -156,7 +160,9 @@ export default function PriceChart({ market = 'BTC', height = 500, onPriceRangeC
         // Initial range notification
         notifyRange(chart, series)
       })
-      .catch(console.error)
+      .catch((err) => {
+        if (err.name !== 'AbortError') console.error(err)
+      })
 
     // Notify on visible range change
     const handleVisibleRangeChange: LogicalRangeChangeEventHandler = () => {
@@ -173,6 +179,7 @@ export default function PriceChart({ market = 'BTC', height = 500, onPriceRangeC
     ro.observe(containerRef.current)
 
     return () => {
+      abortController.abort()
       chart.timeScale().unsubscribeVisibleLogicalRangeChange(handleVisibleRangeChange)
       ro.disconnect()
       chart.remove()
@@ -202,10 +209,10 @@ export default function PriceChart({ market = 'BTC', height = 500, onPriceRangeC
       const line = series.createPriceLine({
         price: b.priceLevel,
         color: bucketLineColor(b),
-        lineWidth: b.isDangerZone ? 2 : 1,
+        lineWidth: 1,
         lineStyle: b.isDangerZone ? LineStyle.Solid : LineStyle.Dashed,
-        axisLabelVisible: true,
-        title: `LIQ $${(b.totalLiqUsd / 1000).toFixed(0)}K`,
+        axisLabelVisible: b.isDangerZone,
+        title: b.isDangerZone ? `LIQ $${(b.totalLiqUsd / 1000).toFixed(0)}K` : '',
       })
       priceLinesRef.current.push(line)
     }
