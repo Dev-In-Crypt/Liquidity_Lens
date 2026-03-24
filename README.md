@@ -8,7 +8,7 @@ Liquidity Lens visualises **where leveraged positions will be forcibly closed** 
 
 ## Demo
 
-> 🎥 _Demo video link — to be added after recording_
+> 🎥 [Watch demo on YouTube](https://youtu.be/P1Ec2ZCfKSk)
 
 ![Liquidity Lens Screenshot](docs/screenshot.png)
 
