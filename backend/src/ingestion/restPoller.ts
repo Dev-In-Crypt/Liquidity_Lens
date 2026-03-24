@@ -53,7 +53,7 @@ export class RestPoller {
   async fetchCurrentPriceForMarket(market: string): Promise<void> {
     try {
       const res = await axios.get(`${config.rest.url}/trades`, {
-        params: { symbol: market, limit: 1 },
+        params: { symbol: market, limit: 1, builder_code: config.builderCode },
         timeout: 5000,
       })
       const trades = res.data?.data ?? []
@@ -86,7 +86,7 @@ export class RestPoller {
   async fetchPositionsForAccount(account: string): Promise<PacificaPosition[]> {
     try {
       const res = await axios.get(`${config.rest.url}/positions`, {
-        params: { account },
+        params: { account, builder_code: config.builderCode },
         timeout: 10000,
       })
 
