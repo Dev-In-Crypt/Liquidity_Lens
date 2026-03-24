@@ -37,23 +37,31 @@ export default function HeatmapChart({
     const svg = d3.select(svgRef.current)
     svg.selectAll('*').remove()
 
-    const visible = buckets.filter(
-      (b) => b.priceLevel >= visiblePriceMin && b.priceLevel <= visiblePriceMax
-    )
+    const visible = buckets.filter((b) => b.priceLevel > 0)
     if (visible.length === 0) return
+
+    const prices = visible.map((b) => b.priceLevel)
+    const domainMin = Math.min(...prices)
+    const domainMax = Math.max(...prices)
+    // Add 5% padding so bars at extremes aren't clipped
+    const padding = (domainMax - domainMin) * 0.05 || 1
 
     const yScale = d3
       .scaleLinear()
-      .domain([visiblePriceMin, visiblePriceMax])
+      .domain([domainMin - padding, domainMax + padding])
       .range([height, 0])
 
     const maxLiq = d3.max(visible, (b) => b.totalLiqUsd) ?? 1
     const xScale = d3.scaleLinear().domain([0, maxLiq]).range([0, MAX_BAR_WIDTH])
 
-    const priceBucketSize = visible[1]
-      ? Math.abs(visible[1].priceLevel - visible[0].priceLevel)
-      : 50
-    const barHeight = Math.max(Math.abs(yScale(0) - yScale(priceBucketSize)) - 1, 1)
+    // Use minimum gap between adjacent buckets — robust across BTC/ETH/SOL
+    const sortedLevels = visible.map((b) => b.priceLevel).sort((a, b) => a - b)
+    const minGap =
+      sortedLevels.length >= 2
+        ? Math.min(...sortedLevels.slice(1).map((p, i) => p - sortedLevels[i]))
+        : domainMax - domainMin || 50
+    const priceBucketSize = minGap
+    const barHeight = Math.max(Math.abs(yScale(0) - yScale(priceBucketSize)) - 1, 2)
 
     // Tooltip
     const tooltip = d3
@@ -134,7 +142,7 @@ export default function HeatmapChart({
         .attr('stroke-width', 1)
         .attr('stroke-dasharray', '4 3')
     }
-  }, [buckets, currentPrice, visiblePriceMin, visiblePriceMax, height])
+  }, [buckets, currentPrice, height])
 
   return (
     <svg
