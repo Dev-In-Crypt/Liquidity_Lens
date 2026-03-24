@@ -101,7 +101,7 @@ export default function Dashboard() {
               letterSpacing: '-0.3px',
             }}
           >
-            LiquidityLens
+            Liquidity Lens
           </span>
           <span
             style={{
